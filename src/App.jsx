@@ -15,18 +15,24 @@ export default function App() {
     count: ''
   }]);
 
+  const gridContainerStyle = {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    gap: '20px',
+    maxWidth: '100%'
+  };
+
   const containerStyle = {
-    maxWidth: '1200px',
-    margin: '0 auto',
-    padding: '20px',
+    padding: '20px', // Increased padding
+    paddingTop: '50px', // Added top padding for delete button
     backgroundColor: '#ffffff',
     borderRadius: '8px',
     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
   };
 
   const chartContainerStyle = {
-    marginTop: '20px',
-    padding: '20px',
+    marginTop: '10px',
+    padding: '10px',
     backgroundColor: '#ffffff',
     borderRadius: '8px',
     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
@@ -35,7 +41,7 @@ export default function App() {
   const axisControlsStyle = {
     display: 'flex',
     gap: '20px',
-    marginBottom: '20px'
+    marginBottom: '10px'
   };
 
   const inputGroupStyle = {
@@ -65,6 +71,19 @@ export default function App() {
     cursor: 'pointer',
     marginBottom: '20px',
     fontSize: '14px'
+  };
+
+  const deleteButtonStyle = {
+    padding: '6px 12px',
+    backgroundColor: '#fa5252',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontSize: '14px',
+    position: 'absolute',
+    right: '20px',
+    top: '20px'
   };
 
   const editableTitleStyle = {
@@ -99,6 +118,10 @@ export default function App() {
       selectedWeek: '',
       count: ''
     }]);
+  };
+
+  const deleteGraph = (id) => {
+    setGraphs(graphs.filter(graph => graph.id !== id));
   };
 
   const updateGraph = (id, field, value) => {
@@ -174,115 +197,125 @@ export default function App() {
         Add New Production Graph
       </button>
 
-      {graphs.map(graph => (
-        <div key={graph.id} style={containerStyle}>
-          <div style={inputGroupStyle}>
-            <label style={labelStyle}>Start Date:</label>
-            <input
-              type="date"
-              value={graph.startDate}
-              onChange={(e) => updateGraph(graph.id, 'startDate', e.target.value)}
-              style={inputStyle}
-            />
-          </div>
-
-          <div style={inputGroupStyle}>
-            <label style={labelStyle}>Select Week:</label>
-            <select 
-              value={graph.selectedWeek}
-              onChange={(e) => updateGraph(graph.id, 'selectedWeek', e.target.value)}
-              style={inputStyle}
-            >
-              <option value="">Select a week</option>
-              {generateWeekOptions(graph.startDate)}
-            </select>
-          </div>
-
-          <div style={inputGroupStyle}>
-            <label style={labelStyle}>Production Count:</label>
-            <input
-              type="number"
-              value={graph.count}
-              onChange={(e) => handleCountChange(graph.id, e.target.value, graph.selectedWeek)}
-              style={inputStyle}
-              placeholder="Enter production count"
-            />
-          </div>
-
-          <div style={chartContainerStyle}>
-            <div style={axisControlsStyle}>
-              <div style={inputGroupStyle}>
-                <label style={labelStyle}>Lowest Point</label>
-                <input
-                  type="number"
-                  value={graph.yAxisMinInput}
-                  onChange={(e) => updateGraph(graph.id, 'yAxisMinInput', e.target.value)}
-                  style={inputStyle}
-                />
-              </div>
-              <div style={inputGroupStyle}>
-                <label style={labelStyle}>Highest Point</label>
-                <input
-                  type="number"
-                  value={graph.yAxisMaxInput}
-                  onChange={(e) => updateGraph(graph.id, 'yAxisMaxInput', e.target.value)}
-                  style={inputStyle}
-                />
-              </div>
+      <div style={gridContainerStyle}>
+        {graphs.map(graph => (
+          <div key={graph.id} style={{ ...containerStyle, position: 'relative' }}>
+            {graph.id !== 1 && (
+              <button 
+                onClick={() => deleteGraph(graph.id)} 
+                style={deleteButtonStyle}
+              >
+                Delete
+              </button>
+            )}
+            <div style={inputGroupStyle}>
+              <label style={labelStyle}>Start Date:</label>
+              <input
+                type="date"
+                value={graph.startDate}
+                onChange={(e) => updateGraph(graph.id, 'startDate', e.target.value)}
+                style={inputStyle}
+              />
             </div>
 
-            <LineChart 
-              width={900} 
-              height={400} 
-              data={generateWeeklyData(graph.startDate, graph.weeklyValues)}
-              margin={{ top: 20, right: 20, left: 0, bottom: 20 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="#e9ecef" />
-              <XAxis 
-                dataKey="week" 
-                stroke="#495057"
-                tick={{ fill: '#495057', fontSize: 12 }}
-                tickLine={{ stroke: '#495057' }}
+            <div style={inputGroupStyle}>
+              <label style={labelStyle}>Select Week:</label>
+              <select 
+                value={graph.selectedWeek}
+                onChange={(e) => updateGraph(graph.id, 'selectedWeek', e.target.value)}
+                style={inputStyle}
+              >
+                <option value="">Select a week</option>
+                {generateWeekOptions(graph.startDate)}
+              </select>
+            </div>
+
+            <div style={inputGroupStyle}>
+              <label style={labelStyle}>Production Count:</label>
+              <input
+                type="number"
+                value={graph.count}
+                onChange={(e) => handleCountChange(graph.id, e.target.value, graph.selectedWeek)}
+                style={inputStyle}
+                placeholder="Enter production count"
               />
-              <YAxis 
-                domain={[Number(graph.yAxisMinInput), Number(graph.yAxisMaxInput)]}
-                stroke="#495057"
-                tick={{ fill: '#495057' }}
-                tickLine={{ stroke: '#495057' }}
-                allowDataOverflow={true}
+            </div>
+
+            <div style={chartContainerStyle}>
+              <div style={axisControlsStyle}>
+                <div style={inputGroupStyle}>
+                  <label style={labelStyle}>Lowest Point</label>
+                  <input
+                    type="number"
+                    value={graph.yAxisMinInput}
+                    onChange={(e) => updateGraph(graph.id, 'yAxisMinInput', e.target.value)}
+                    style={inputStyle}
+                  />
+                </div>
+                <div style={inputGroupStyle}>
+                  <label style={labelStyle}>Highest Point</label>
+                  <input
+                    type="number"
+                    value={graph.yAxisMaxInput}
+                    onChange={(e) => updateGraph(graph.id, 'yAxisMaxInput', e.target.value)}
+                    style={inputStyle}
+                  />
+                </div>
+              </div>
+
+              <LineChart 
+                width={600}
+                height={350}
+                data={generateWeeklyData(graph.startDate, graph.weeklyValues)}
+                margin={{ top: 20, right: 20, left: 0, bottom: 20 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#e9ecef" />
+                <XAxis 
+                  dataKey="week" 
+                  stroke="#495057"
+                  tick={{ fill: '#495057', fontSize: 12 }}
+                  tickLine={{ stroke: '#495057' }}
+                />
+                <YAxis 
+                  domain={[Number(graph.yAxisMinInput), Number(graph.yAxisMaxInput)]}
+                  stroke="#495057"
+                  tick={{ fill: '#495057' }}
+                  tickLine={{ stroke: '#495057' }}
+                  allowDataOverflow={true}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #dee2e6',
+                    borderRadius: '4px',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                  }}
+                />
+                <Legend wrapperStyle={{ paddingTop: '20px' }}/>
+                <Line 
+                  type="monotone" 
+                  dataKey="value" 
+                  stroke="#228be6" 
+                  strokeWidth={2}
+                  dot={{ fill: '#228be6', strokeWidth: 2 }}
+                  activeDot={{ r: 6, fill: '#228be6', stroke: '#ffffff', strokeWidth: 2 }}
+                  name="Production"
+                />
+              </LineChart>
+              <input
+                type="text"
+                value={graph.graphTitle}
+                onChange={(e) => updateGraph(graph.id, 'graphTitle', e.target.value)}
+                style={editableTitleStyle}
+                onFocus={(e) => e.target.style.border = '1px dashed #adb5bd'}
+                onBlur={(e) => e.target.style.border = '1px solid transparent'}
+                onMouseEnter={(e) => Object.assign(e.target.style, editableTitleHoverStyle)}
+                onMouseLeave={(e) => Object.assign(e.target.style, editableTitleStyle)}
               />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #dee2e6',
-                  borderRadius: '4px',
-                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
-                }}
-              />
-              <Legend wrapperStyle={{ paddingTop: '20px' }}/>
-              <Line 
-                type="monotone" 
-                dataKey="value" 
-                stroke="#228be6" 
-                strokeWidth={2}
-                dot={{ fill: '#228be6', strokeWidth: 2 }}
-                activeDot={{ r: 6, fill: '#228be6', stroke: '#ffffff', strokeWidth: 2 }}
-                name="Production"
-              />
-            </LineChart>
-            <input
-              type="text"
-              value={graph.graphTitle}
-              onChange={(e) => updateGraph(graph.id, 'graphTitle', e.target.value)}
-              style={editableTitleStyle}
-              onFocus={(e) => e.target.style.border = '1px dashed #adb5bd'}
-              onBlur={(e) => e.target.style.border = '1px solid transparent'}
-              onMouseEnter={(e) => Object.assign(e.target.style, editableTitleHoverStyle)}
-              onMouseLeave={(e) => Object.assign(e.target.style, editableTitleStyle)}
-            />
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
